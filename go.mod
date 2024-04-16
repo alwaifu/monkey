@@ -1,6 +1,8 @@
-module monkey
+module github.com/alwaifu/monkey
 
 go 1.21.1
+
+replace github.com/alwaifu/monkey/ => ./
 
 require github.com/spf13/cobra v1.8.0
 

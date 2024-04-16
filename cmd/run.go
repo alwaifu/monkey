@@ -4,8 +4,9 @@ Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	monkey "monkey/pkg"
 	"os"
+
+	monkey "github.com/alwaifu/monkey/pkg"
 
 	"github.com/spf13/cobra"
 )

@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"monkey/pkg/ast"
 	"strings"
+
+	"github.com/alwaifu/monkey/pkg/ast"
 )
 
 type ObjectType string

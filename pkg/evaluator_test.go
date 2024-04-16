@@ -3,9 +3,9 @@ package monkey
 import (
 	"testing"
 
-	"monkey/pkg/ast"
-	"monkey/pkg/lexer"
-	"monkey/pkg/object"
+	"github.com/alwaifu/monkey/pkg/ast"
+	"github.com/alwaifu/monkey/pkg/lexer"
+	"github.com/alwaifu/monkey/pkg/object"
 )
 
 func testEval(input string) object.Object {

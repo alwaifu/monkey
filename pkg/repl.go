@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io"
 
-	"monkey/pkg/ast"
-	"monkey/pkg/lexer"
-	"monkey/pkg/object"
+	"github.com/alwaifu/monkey/pkg/ast"
+	"github.com/alwaifu/monkey/pkg/lexer"
+	"github.com/alwaifu/monkey/pkg/object"
 )
 
 const PROMPT = ">> "

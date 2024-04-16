@@ -2,7 +2,8 @@ package monkey
 
 import (
 	"fmt"
-	"monkey/pkg/object"
+
+	"github.com/alwaifu/monkey/pkg/object"
 )
 
 var builtins = map[string]*object.Builtin{

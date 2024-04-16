@@ -1,10 +1,11 @@
 package monkey
 
 import (
-	"monkey/pkg/ast"
-	"monkey/pkg/lexer"
-	"monkey/pkg/object"
 	"testing"
+
+	"github.com/alwaifu/monkey/pkg/ast"
+	"github.com/alwaifu/monkey/pkg/lexer"
+	"github.com/alwaifu/monkey/pkg/object"
 )
 
 func BenchmarkEvalIntegerExpression(b *testing.B) {

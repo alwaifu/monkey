@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"monkey/pkg/lexer"
+	"github.com/alwaifu/monkey/pkg/lexer"
 )
 
 func TestLetStatements(t *testing.T) {

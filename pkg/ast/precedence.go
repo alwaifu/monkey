@@ -1,6 +1,6 @@
 package ast
 
-import "monkey/pkg/lexer"
+import "github.com/alwaifu/monkey/pkg/lexer"
 
 const (
 	_ int = iota

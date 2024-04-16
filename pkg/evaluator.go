@@ -2,8 +2,9 @@ package monkey
 
 import (
 	"fmt"
-	"monkey/pkg/ast"
-	"monkey/pkg/object"
+
+	"github.com/alwaifu/monkey/pkg/ast"
+	"github.com/alwaifu/monkey/pkg/object"
 )
 
 var (

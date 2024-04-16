@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"monkey/pkg/lexer"
+	"github.com/alwaifu/monkey/pkg/lexer"
 )
 
 type Node interface {
