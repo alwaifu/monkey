@@ -1,7 +1,7 @@
 /*
 Copyright © 2024 NAME HERE <EMAIL ADDRESS>
 */
-package monkey
+package main
 
 import "github.com/alwaifu/monkey/cmd"
 

@@ -1,4 +1,4 @@
-package monkey
+package interpreter
 
 import (
 	"fmt"
@@ -8,9 +8,9 @@ import (
 )
 
 var (
-	TRUE  = object.Boolean(true)
-	FALSE = object.Boolean(false)
-	NULL  = &object.Null{}
+	TRUE  = object.True
+	FALSE = object.False
+	NULL  = object.NULL
 )
 
 func Eval(node ast.Node, env *object.Environment) object.Object {
@@ -38,7 +38,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	// expression
 	case *ast.IntegerLiteral:
 		return object.Integer(node.Value)
-	case *ast.Boolean:
+	case *ast.BooleanLiteral:
 		return nativeBoolToBooleanObject(node.Value)
 	case *ast.StringLiteral:
 		return object.String(node.Value)
@@ -243,7 +243,7 @@ func evalBooleanInfixExpression(operator string, left, right object.Boolean) obj
 func evalIdentifier(node *ast.Identifier, env *object.Environment) object.Object {
 	if val, ok := env.Get(node.Value); ok {
 		return val
-	} else if buitin, ok := builtins[node.Value]; ok {
+	} else if buitin := object.GetBuiltinByName(node.Value); buitin != nil {
 		return buitin
 	} else {
 		return newError("identifier not found: " + node.Value)

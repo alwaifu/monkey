@@ -152,18 +152,18 @@ func (il *IntegerLiteral) String() string       { return il.Token.Literal }
 // ---
 
 var (
-	_ Node       = (*Boolean)(nil)
-	_ Expression = (*Boolean)(nil)
+	_ Node       = (*BooleanLiteral)(nil)
+	_ Expression = (*BooleanLiteral)(nil)
 )
 
-type Boolean struct {
+type BooleanLiteral struct {
 	Token lexer.Token
 	Value bool
 }
 
-func (b *Boolean) expressionNode()      {}
-func (b *Boolean) TokenLiteral() string { return b.Token.Literal }
-func (b *Boolean) String() string       { return b.Token.Literal }
+func (b *BooleanLiteral) expressionNode()      {}
+func (b *BooleanLiteral) TokenLiteral() string { return b.Token.Literal }
+func (b *BooleanLiteral) String() string       { return b.Token.Literal }
 
 // ---
 
@@ -392,11 +392,6 @@ func (ce *CallExpression) String() string {
 
 // ---
 
-type (
-	prefixParseFn func() Expression
-	infixParseFns map[lexer.TokenType]func(Expression) Expression
-)
-
 // Parser 语法解析器
 type Parser struct {
 	l      *lexer.Lexer
@@ -421,8 +416,8 @@ func NewParser(l *lexer.Lexer) *Parser {
 	p.prefixParseFns = map[lexer.TokenType]func() Expression{
 		lexer.IDENT:    p.parseIdentifier,
 		lexer.INT:      p.parseIntegerLiteral,
-		lexer.TRUE:     p.parseBoolean,
-		lexer.FALSE:    p.parseBoolean,
+		lexer.TRUE:     p.parseBooleanLiteral,
+		lexer.FALSE:    p.parseBooleanLiteral,
 		lexer.STRING:   p.parseStringLiteral,
 		lexer.BANG:     p.parsePrefixExpression,
 		lexer.MINUS:    p.parsePrefixExpression,
@@ -515,8 +510,8 @@ func (p *Parser) parseIntegerLiteral() Expression {
 	}
 	return &IntegerLiteral{Token: p.curToken, Value: value}
 }
-func (p *Parser) parseBoolean() Expression {
-	return &Boolean{Token: p.curToken, Value: p.curToken.Type == lexer.TRUE}
+func (p *Parser) parseBooleanLiteral() Expression {
+	return &BooleanLiteral{Token: p.curToken, Value: p.curToken.Type == lexer.TRUE}
 }
 func (p *Parser) parseStringLiteral() Expression {
 	return &StringLiteral{Token: p.curToken, Value: p.curToken.Literal}
@@ -661,8 +656,7 @@ func (p *Parser) parseExpression(curPrecedence int) Expression {
 		return nil
 	}
 	leftExp := prefix()
-	nextPrecedence := precedence(p.peekToken)
-	for p.peekToken.Type != lexer.SEMICOLON && curPrecedence < nextPrecedence {
+	for nextPrecedence := precedence(p.peekToken); p.peekToken.Type != lexer.SEMICOLON && curPrecedence < nextPrecedence; nextPrecedence = precedence(p.peekToken) {
 		infix := p.infixParseFns[p.peekToken.Type]
 		if infix == nil {
 			return leftExp

@@ -6,10 +6,13 @@ package cmd
 import (
 	"os"
 
-	monkey "github.com/alwaifu/monkey/pkg"
+	"github.com/alwaifu/monkey/pkg/interpreter"
+	"github.com/alwaifu/monkey/pkg/vm"
 
 	"github.com/spf13/cobra"
 )
+
+var runVersion *int = new(int)
 
 // runCmd represents the run command
 var runCmd = &cobra.Command{
@@ -22,7 +25,10 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		monkey.Start(os.Stdin, os.Stdout)
+		if *runVersion == 1 {
+			interpreter.Start(os.Stdin, os.Stdout)
+		}
+		vm.Start(os.Stdin, os.Stdout)
 	},
 }
 
@@ -38,4 +44,6 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// runCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	runCmd.Flags().IntVar(runVersion, "ver", 2, "run version, version 1 will interprete ast tree directly, version 2 will use virtual machine")
 }

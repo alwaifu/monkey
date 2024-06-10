@@ -19,3 +19,13 @@
 
 # Go workspace file
 go.work
+.vscode/
+
+# System files
+**/.DS_Store
+
+# Reference books, papers and other materials
+wacig_code_1.2.zip
+wacig_code_1.2/
+waiig_code_1.7.zip
+waiig_code_1.7/

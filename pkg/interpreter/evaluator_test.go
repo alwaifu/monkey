@@ -1,4 +1,4 @@
-package monkey
+package interpreter
 
 import (
 	"testing"
@@ -60,21 +60,22 @@ func TestErrorHandling(t *testing.T) {
 		{
 			"foobar", "identifier not found: foobar",
 		},
-		{
-			`{"name": "Monkey"}[fn(x) { x }];`,
-			"unusable as hash key: FUNCTION",
-		},
+		// TODO: implement hash
+		// {
+		// 	`{"name": "Monkey"}[fn(x) { x }];`,
+		// 	"unusable as hash key: FUNCTION",
+		// },
 		{`999[1]`, "index operator not supported: INTEGER"},
 	}
 	for _, tt := range tests {
 		evaluated := testEval(tt.input)
 		errObj, ok := evaluated.(*object.Error)
 		if !ok {
-			t.Errorf("no error object returned. got=%T(%+v)", evaluated, evaluated)
+			t.Errorf("input: %s, no error object returned. got=%T(%+v)", tt.input, evaluated, evaluated)
 			continue
 		}
 		if errObj.Message != tt.expectedMessage {
-			t.Errorf("wrong error message. expected=%q, got=%q", tt.expectedMessage, errObj.Message)
+			t.Errorf("input: %s, wrong error message. expected=%q, got=%q", tt.input, tt.expectedMessage, errObj.Message)
 		}
 	}
 }

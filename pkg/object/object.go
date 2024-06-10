@@ -83,11 +83,18 @@ const (
 
 	// 指针类型
 
-	RETURN_VALUE_OBJ = "RETURN_VALUE"
-	ERROR_OBJ        = "ERROR"
-	FUNCTION_OBJ     = "FUNCTION"
-	BUILTIN_OBJ      = "BUILTIN"
-	ARRAY_OBJ        = "ARRAY"
+	RETURN_VALUE_OBJ      = "RETURN_VALUE"
+	ERROR_OBJ             = "ERROR"
+	FUNCTION_OBJ          = "FUNCTION"
+	BUILTIN_OBJ           = "BUILTIN"
+	COMPILED_FUNCTION_OBJ = "COMPILED_FUNCTION"
+	ARRAY_OBJ             = "ARRAY"
+)
+
+var (
+	True  = Boolean(true)
+	False = Boolean(false)
+	NULL  = Null{}
 )
 
 type Null struct{}
@@ -172,6 +179,15 @@ type Builtin struct {
 
 func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
 func (b *Builtin) Inspect() string  { return "builtin function" }
+
+type CompiledFunction struct {
+	Instructions  []byte
+	NumLocals     int
+	NumParameters int
+}
+
+func (cf *CompiledFunction) Type() ObjectType { return COMPILED_FUNCTION_OBJ }
+func (cf *CompiledFunction) Inspect() string  { return fmt.Sprintf("CompiledFunction[%p]", cf) }
 
 var _ Object = (*Array)(nil)
 
