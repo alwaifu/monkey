@@ -75,6 +75,14 @@ func (vm *VM) Run() error {
 			vm.push(True)
 		case OpFalse:
 			vm.push(False)
+		case OpAnd:
+			right := isTruthy(vm.pop())
+			left := isTruthy(vm.pop())
+			vm.push(object.Boolean(left && right))
+		case OpOr:
+			right := isTruthy(vm.pop())
+			left := isTruthy(vm.pop())
+			vm.push(object.Boolean(left || right))
 		case OpEqual:
 			right := vm.pop()
 			left := vm.pop()

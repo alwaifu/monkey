@@ -2,7 +2,6 @@ package object
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -13,62 +12,6 @@ type ObjectType string
 type Object interface {
 	Type() ObjectType
 	Inspect() string
-}
-
-func NewEnviromentFromMap(dir map[string]interface{}) (*Environment, error) {
-	store := make(map[string]Object, len(dir))
-	for k, v := range dir {
-		switch v := v.(type) {
-		case bool:
-			store[k] = Boolean(v)
-		case int:
-			store[k] = Integer(v)
-		case int64:
-			store[k] = Integer(v)
-		case string:
-			store[k] = String(v)
-		default:
-			return nil, errors.New("invalid type")
-		}
-	}
-	return &Environment{store: store}, nil
-}
-func ToGoValue(obj Object) (interface{}, error) {
-	switch obj := obj.(type) {
-	case Boolean:
-		return bool(obj), nil
-	case Integer:
-		return int64(obj), nil
-	case String:
-		return string(obj), nil
-	default:
-		return nil, errors.New("invalid type")
-	}
-}
-func NewEnviroment() *Environment {
-	return &Environment{store: make(map[string]Object)}
-}
-func NewEnclosedEnvironment(outer *Environment) *Environment {
-	env := NewEnviroment()
-	env.outer = outer
-	return env
-}
-
-type Environment struct {
-	store map[string]Object
-	outer *Environment
-}
-
-func (e *Environment) Get(name string) (Object, bool) {
-	obj, ok := e.store[name]
-	if !ok && e.outer != nil {
-		obj, ok = e.outer.Get(name)
-	}
-	return obj, ok
-}
-func (e *Environment) Set(name string, val Object) Object {
-	e.store[name] = val
-	return val
 }
 
 // TODO: 调整对象系统 使用golang原生对象 提高求值性能
@@ -125,8 +68,7 @@ var _ Object = (String)("")
 func (s String) Type() ObjectType { return STRING_OBJ }
 func (s String) Inspect() string  { return string(s) }
 
-// ---
-
+// ReturnValue
 type ReturnValue struct {
 	Value Object
 }
@@ -136,6 +78,7 @@ var _ Object = (*ReturnValue)(nil)
 func (rv *ReturnValue) Type() ObjectType { return RETURN_VALUE_OBJ }
 func (rv *ReturnValue) Inspect() string  { return rv.Value.Inspect() }
 
+// Error
 type Error struct {
 	Message string
 }
@@ -146,6 +89,7 @@ func (e *Error) Type() ObjectType { return ERROR_OBJ }
 func (e *Error) Inspect() string  { return "ERROR: " + e.Message }
 func (e Error) Error() string     { return e.Message }
 
+// Function for interpreter
 type Function struct {
 	Parameters []*ast.Identifier
 	Body       *ast.BlockStatement
@@ -169,6 +113,7 @@ func (f *Function) Inspect() string {
 	return out.String()
 }
 
+// BuiltinFunction
 type BuiltinFunction func(args ...Object) Object
 
 var _ Object = (*Builtin)(nil)
@@ -180,20 +125,24 @@ type Builtin struct {
 func (b *Builtin) Type() ObjectType { return BUILTIN_OBJ }
 func (b *Builtin) Inspect() string  { return "builtin function" }
 
+// CompiledFunction for vm
 type CompiledFunction struct {
 	Instructions  []byte
 	NumLocals     int
 	NumParameters int
 }
 
+var _ Object = (*CompiledFunction)(nil)
+
 func (cf *CompiledFunction) Type() ObjectType { return COMPILED_FUNCTION_OBJ }
 func (cf *CompiledFunction) Inspect() string  { return fmt.Sprintf("CompiledFunction[%p]", cf) }
 
-var _ Object = (*Array)(nil)
-
+// Array
 type Array struct {
 	Elements []Object
 }
+
+var _ Object = (*Array)(nil)
 
 func (ao *Array) Type() ObjectType { return ARRAY_OBJ }
 func (ao *Array) Inspect() string {

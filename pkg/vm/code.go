@@ -15,6 +15,8 @@ const (
 	OpDiv
 	OpTrue
 	OpFalse
+	OpAnd
+	OpOr
 	OpEqual
 	OpNotEqual
 	OpGt
@@ -53,6 +55,8 @@ var definitions = map[Opcode]Definition{
 	OpDiv:            {"OpDiv", []int{}},
 	OpTrue:           {"OpTrue", []int{}},
 	OpFalse:          {"OpFalse", []int{}},
+	OpAnd:            {"OpAnd", []int{}},
+	OpOr:             {"OpOr", []int{}},
 	OpEqual:          {"OpEqual", []int{}},
 	OpNotEqual:       {"OpNotEqual", []int{}},
 	OpGt:             {"OpGt", []int{}},

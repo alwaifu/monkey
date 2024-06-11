@@ -1,10 +1,10 @@
 《用Go语言自制解释器》 读书笔记
-
+![](https://file.ituring.com.cn/LargeCover/22050c8411f3053b4c33)  
 基于《用Go语言自制解释器》实现解释器 直接解释 AST Tree 执行
 
 # 词法分析
 解释源代码，需要两次转换
-![](https://res.weread.qq.com/wrepub/CB_3300018889_2.jpg)
+![](https://res.weread.qq.com/wrepub/CB_3300018889_2.jpg)  
 第一次为词法分析
 比如源码
 ```
@@ -75,7 +75,7 @@ const (
 )
 ```
 遍历源码字符串，挨个字节解析
-* 判断字符为`+-*/<,;()[]{}`直接构造成对应token,
+* 判断字符为`+-*/,;()[]{}`直接构造成对应token,
 * 判断字符为`=!<>`额外读取下一个字符判断是否为`==`,`!=`,`<=`,`>=`
 * 判断字符为`"`构造为 `STRING` TOKEN
 * 判断字符为数字构造为 `INT` TOKEN
@@ -128,14 +128,16 @@ JavaScript使用MagicLexer和MagicParser生成AST示例
 此处语法分析器是递归下降语法分析器。基于自上而下的运算符优先级分析法的语法分析器。因为发明人是沃恩·普拉特（Vaughan Pratt），所以有时它也称为普拉特语法分析器。
 
 ## 语句和表达式
+这里的AST只包含两种节点，语句节点、表达式节点。
 表达式会产生值而语句不会。
 ### 解析语句
-在Monkey语言中只有两种语句：let语句、return语句。其他都是表达式
+仅有的三种语句：let语句、return语句、表达式语句
 ```
 let <标识符> = <表达式>;
 return <表达式>;
+<表达式>;
 ```
-![](https://res.weread.qq.com/wrepub/CB_3300018889_3.jpg)
+![](https://res.weread.qq.com/wrepub/CB_3300018889_3.jpg)  
 移动词法单元指针并检查当前词法单元，根据当前词法单元来构造AST节点
 ### 解析表达式
 难点：
@@ -167,18 +169,19 @@ type InfixExpression struct {
 }
 ```
 例如解析表达式 `1 + 2 + 3;` 最大的挑战不是在最终的AST中表示每个运算符和操作数，而是如何正确嵌套AST的节点。最后得到的应该是一个AST如下所示：
+
 ![](https://res.weread.qq.com/wrepub/CB_3300018889_4.jpg)
 
 1. 首先检查是否有一个与当前`p.curToken`关联的 `prefixParseFn` 函数。
-此处 token.INT 关联的前缀解析函数得到 `*ast.IntegerLiteral`
+此处 token.INT 关联的前缀解析函数得到 `*ast.IntegerLiteral`  
 ![](https://res.weread.qq.com/wrepub/CB_3300018889_5.jpg)
-2. 循环判断`p.peekToken`优先级是否更高，如果`p.peekToken`优先级更高，调用`p.peekToken`的`infixParseFn`函数。
+2. 循环判断`p.peekToken`优先级是否更高，如果`p.peekToken`优先级更高，调用`p.peekToken`的`infixParseFn`函数。  
 ![](https://res.weread.qq.com/wrepub/CB_3300018889_6.jpg)
-3. `infixParseFn`递归调用表达式解析出`*ast.IntegerLiteral`节点并生成`*ast.InfixExpression`节点返回
+3. `infixParseFn`递归调用表达式解析出`*ast.IntegerLiteral`节点并生成`*ast.InfixExpression`节点返回  
 ![](https://res.weread.qq.com/wrepub/CB_3300018889_8.jpg)
-4. 前移词法单元
+4. 前移词法单元  
 ![](https://res.weread.qq.com/wrepub/CB_3300018889_7.jpg)
-5. 并使用前面生成的`*ast.InfixExpression`作为做节点再次生成中缀表达式
+5. 并使用前面生成的`*ast.InfixExpression`作为做节点再次生成中缀表达式  
 ![](https://res.weread.qq.com/wrepub/CB_3300018889_9.jpg)
 
 定义优先级
@@ -250,5 +253,47 @@ function eval(astNode) {
       return leftEvaluated - rightEvaluated
     }
   }
+}
+```
+## 值系统
+在AST中一个`*ast.IntegerLiteral`节点在解释执行的时候如何表示并追踪。
+
+基本类型使用宿主语言的原生类型（整数、布尔值等）来表示所解释语言中的值，用于提升性能；
+列表、~~字典~~、函数使用指针表示值或对象；
+
+```go
+// 定义值系统的interface
+type ObjectType string
+type Object interface {
+	Type() ObjectType
+	Inspect() string
+}
+```
+使用go语言的原生类型表示的基础类型
+```go
+type Null struct{}
+type Integer int64
+type Boolean bool
+type String string
+type BuiltinFunction func(args ...Object) Object
+```
+自定义复杂类型
+ReturnValue、Error 用于分支控制提前退出
+Function 定义参数类型无关的统一函数类型
+Array 封装go原生slice用于任意类型元素
+```go
+type ReturnValue struct {
+	Value Object
+}
+type Error struct {
+	Message string
+}
+type Function struct {
+	Parameters []*ast.Identifier
+	Body       *ast.BlockStatement
+	Env        *Environment
+}
+type Array struct {
+	Elements []Object
 }
 ```
